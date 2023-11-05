@@ -111,7 +111,12 @@ exports.getContests = catchAsync(async (req, res, next) => {
   const contests = await Aptitude.find();
   let contest = [];
 
-  contests.forEach((document) => contest.push(document.contestNumber));
+  contests.forEach((document) =>
+    contest.push({
+      contestNumber: document.contestNumber,
+      contestName: document.contestName,
+    })
+  );
 
   res.status(200).json({
     status: 'success',

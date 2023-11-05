@@ -6,6 +6,10 @@ const qnaSchema = new mongoose.Schema({
     required: [true, 'Provide a contest number'],
     unique: true,
   },
+  contestName: {
+    type: String,
+    required: [true, 'Provide a contest name'],
+  },
   questions: [
     {
       questionNumber: {

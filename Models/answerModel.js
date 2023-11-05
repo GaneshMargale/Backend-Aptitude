@@ -5,6 +5,10 @@ const answerSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Provide a contest number'],
   },
+  contestName: {
+    type: String,
+    required: [true, 'Provide a contest name'],
+  },
   answers: [
     {
       questionNumber: {

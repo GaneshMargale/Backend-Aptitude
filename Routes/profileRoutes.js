@@ -4,7 +4,7 @@ const resultController = require('../Controller/resultController');
 
 const router = express.Router();
 
-router.route('/').post(profileController.createProfile);
+// router.route('/').post(profileController.createProfile);
 
 router.route('/:contestNumber/:usn').patch(
   // resultController.createResult,

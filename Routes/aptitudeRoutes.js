@@ -1,12 +1,13 @@
 const express = require('express');
 const aptitudeController = require('../Controller/aptitudeController');
 const QnAController = require('../Controller/QnAController');
+const authController = require('../Controller/authController');
 
 const router = express.Router();
 
 router
   .route('/questions')
-  .get(aptitudeController.getAllQuestions)
+  .get(authController.protect, aptitudeController.getAllQuestions)
   .post(aptitudeController.createQuestions);
 
 router
@@ -19,7 +20,7 @@ router
   .get(aptitudeController.getQuestion)
   .patch(aptitudeController.updateQuestion);
 
-// router.route('/QnA').get(QnAController.createQnA);
+router.route('/QnA').get(QnAController.getQnA);
 
 router.route('/aptitude/contests').get(aptitudeController.getContests);
 module.exports = router;

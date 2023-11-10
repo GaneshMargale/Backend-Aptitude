@@ -126,9 +126,3 @@ exports.getContests = catchAsync(async (req, res, next) => {
     },
   });
 });
-
-// exports.getAnswersAndQuestions = catchAsync(async (req, res, next) => {
-//   const answer = await Answer.find();
-//   const question = await Aptitude.find();
-//   const QnA = [];
-// });

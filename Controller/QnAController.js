@@ -5,7 +5,7 @@ const Aptitude = require('../Models/aptitudeModel');
 const Answer = require('../Models/answerModel');
 const QnA = require('../Models/qnaModel');
 
-exports.createQnA = catchAsync(async (req, res, next) => {
+exports.getQnA = catchAsync(async (req, res, next) => {
   const Ques = await Aptitude.find();
   const Ans = await Answer.find();
 
@@ -13,21 +13,20 @@ exports.createQnA = catchAsync(async (req, res, next) => {
     return next(new AppError('QnA not found', 404));
   }
 
-  QuesnAns = [];
-
-  Ques.questions.forEach((question, i) => {
+  const QuesnAns = [];
+  for (let j = 0; j < Ques[0].questions.length; j++) {
     let qna = {
-      questionNumber: question.questionNumber,
-      questionDescription: question.questionDescription,
-      options: question.options,
-      answer: Ans.answers[i].answerOption,
+      questionNumber: Ques[0].questions[j].questionNumber,
+      questionDescription: Ques[0].questions[j].questionDescription,
+      options: Ques[0].questions[j].options,
+      answer: Ans[0].answers[j].answerOption,
     };
-
     QuesnAns.push(qna);
-  });
+  }
 
   const newQnA = await QnA.create({
-    contestNumber: 1,
+    contestNumber: Ques[0].contestNumber,
+    contestName: Ques[0].contestName,
     questions: QuesnAns,
   });
 

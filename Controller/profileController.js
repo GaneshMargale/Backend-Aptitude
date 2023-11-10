@@ -21,12 +21,22 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
 });
 
 exports.createProfile = catchAsync(async (req, res, next) => {
-  const newProfile = await Profile.create(req.body);
-
-  res.status(200).json({
-    status: 'success',
-    Profile: newProfile,
+  const newProfile = await Profile.create({
+    usn: req.body.usn,
+    name: req.body.name,
+    branch: req.body.branch,
+    DSAPoints: 0,
+    AptitudePoints: 0,
+    DSAEachPoints: [],
+    AptitudeEachPoints: [],
   });
+
+  console.log('Created successfully');
+
+  // res.status(200).json({
+  //   status: 'success',
+  //   Profile: newProfile,
+  // });
 });
 
 exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {

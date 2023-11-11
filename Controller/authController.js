@@ -44,13 +44,13 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { usn, password } = req.body;
 
-  if (!email || !password) {
-    return next(new AppError('Please provide email and password'), 400);
+  if (!usn || !password) {
+    return next(new AppError('Please provide usn and password'), 400);
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ usn: usn }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password'), 401);
@@ -63,40 +63,6 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
   });
 });
-
-// exports.protect = catchAsync(async (req, res, next) => {
-//   let token;
-
-//   if (
-//     req.headers.authorization &&
-//     req.headers.authorization.startsWith('Bearer')
-//   ) {
-//     token = req.headers.authorization.split(' ')[1];
-//   }
-//   if (!token) {
-//     return next(new AppError('Your are not logged in, Please login'), 401);
-//   }
-
-//   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-//   const freshUser = await User.findById(decoded.id);
-
-//   if (!freshUser) {
-//     return next(
-//       new AppError('The user belonging to this token does not exist'),
-//       401
-//     );
-//   }
-
-//   if (freshUser.changedPasswordAfter(decoded.iat)) {
-//     return next(
-//       new AppError('User recently changed password! Please log in again.', 401)
-//     );
-//   }
-
-//   req.user = freshUser;
-//   next();
-// });
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;

@@ -25,7 +25,6 @@ const resultSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a valid usn'],
         lowercase: true,
-        unique: true,
       },
       branch: {
         type: String,

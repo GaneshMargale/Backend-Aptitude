@@ -17,7 +17,13 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+  })
+);
 
 app.use(express.json());
 

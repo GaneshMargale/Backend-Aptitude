@@ -51,6 +51,7 @@ const profileSchema = new mongoose.Schema({
       contestNumber: {
         type: Number,
         required: [true, 'Provide the contest number'],
+        unique: true,
       },
       contestName: {
         type: String,

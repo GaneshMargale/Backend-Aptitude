@@ -58,8 +58,17 @@ exports.getResult = catchAsync(async (req, res, next) => {
     .paginate();
 
   const result = await features.query;
+  // result.forEach((document) => {
+  //   document.Results.sort((a, b) => b.points - a.points);
+  // });
   result.forEach((document) => {
-    document.Results.sort((a, b) => b.points - a.points);
+    document.Results.sort((a, b) => {
+      if (b.points !== a.points) {
+        return b.points - a.points;
+      }
+
+      return b.timeLeft - a.timeLeft;
+    });
   });
 
   if (!result) {
@@ -108,6 +117,7 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
   const result = await Result.findOneAndUpdate(
     {
       contestNumber: req.params.contestNumber,
+      contestName: req.body.contestName,
     },
     {
       $push: {
@@ -116,6 +126,7 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
           name: profile.name,
           branch: profile.branch,
           points: req.body.points,
+          timeLeft: req.body.timeLeft,
         },
       },
     },

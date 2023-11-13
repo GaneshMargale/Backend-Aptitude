@@ -44,7 +44,7 @@ const resultSchema = new mongoose.Schema({
         required: [true, 'Provide the points'],
       },
       timeLeft: {
-        type: Date,
+        type: Number,
         required: [true, 'Provide the time'],
       },
     },

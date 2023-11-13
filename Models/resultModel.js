@@ -6,15 +6,15 @@ const resultSchema = new mongoose.Schema({
     required: [true, 'Provide a contest number'],
     unique: true,
   },
-  contestType: {
-    type: String,
-    required: [true, 'Provide a contest type'],
-    lowercase: true,
-    enum: {
-      values: ['aptitude', 'dsa'],
-      message: 'The type shoulde be aptitude or dsa',
-    },
-  },
+  // contestType: {
+  //   type: String,
+  //   required: [true, 'Provide a contest type'],
+  //   lowercase: true,
+  //   enum: {
+  //     values: ['aptitude', 'dsa'],
+  //     message: 'The type shoulde be aptitude or dsa',
+  //   },
+  // },
   contestName: {
     type: String,
     required: [true, 'Provide a contest name'],
@@ -42,6 +42,10 @@ const resultSchema = new mongoose.Schema({
       points: {
         type: Number,
         required: [true, 'Provide the points'],
+      },
+      timeLeft: {
+        type: Date,
+        required: [true, 'Provide the time'],
       },
     },
   ],

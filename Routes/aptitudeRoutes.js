@@ -20,7 +20,8 @@ router
   .get(aptitudeController.getQuestion)
   .patch(aptitudeController.updateQuestion);
 
-router.route('/QnA').get(QnAController.getQnA);
+router.route('/CreateQnA').get(QnAController.getQnA);
+router.route('/GetQnA').get(QnAController.getAllQnA);
 
 router.route('/aptitude/contests').get(aptitudeController.getContests);
 module.exports = router;

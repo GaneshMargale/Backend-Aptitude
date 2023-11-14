@@ -5,6 +5,23 @@ const Aptitude = require('../Models/aptitudeModel');
 const Answer = require('../Models/answerModel');
 const QnA = require('../Models/qnaModel');
 
+exports.getAllQnA = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(QnA.find(), req.query)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  const qna = await features.query;
+  res.status(200).json({
+    status: 'success',
+    results: qna.length,
+    data: {
+      QnA: qna,
+    },
+  });
+});
+
 exports.getQnA = catchAsync(async (req, res, next) => {
   const Ques = await Aptitude.find();
   const Ans = await Answer.find();

@@ -63,7 +63,7 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
   );
   console.log(profile);
   if (!profile) {
-    return next(new AppError('Question not found', 404));
+    return next(new AppError('Profile not found', 404));
   }
 
   res.status(200).json({

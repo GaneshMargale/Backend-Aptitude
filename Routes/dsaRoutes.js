@@ -12,4 +12,16 @@ router
   .route('/:contestNumber/:type/:language/:question')
   .patch(dsaController.updateCodeSnippits);
 
+router.route('/CreateTestCase').post(dsaController.createTestCases);
+
+router
+  .route('/questions')
+  .get(dsaController.getDSAQuestions)
+  .post(dsaController.createDSAQuestions);
+
+router
+  .route('/questions/:contestNumber')
+  .delete(dsaController.deleteDSAQuestions);
+
+router.route('/previousQuestions').get(dsaController.getPreviousDSA);
 module.exports = router;

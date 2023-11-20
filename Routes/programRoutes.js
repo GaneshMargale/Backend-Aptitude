@@ -5,6 +5,6 @@ const router = express.Router();
 
 router
   .route('/:contestNumber/:language/:qNumber')
-  .patch(programController.runProgram);
+  .post(programController.runProgram);
 
 module.exports = router;

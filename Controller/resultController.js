@@ -114,6 +114,14 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
     return next(new AppError('Profile not found', 404));
   }
 
+  const contest = profile.AptitudeEachPoints.some(
+    (content) => content.contestNumber === req.params.contestNumber
+  );
+
+  if (contest) {
+    return next();
+  }
+
   const result = await Result.findOneAndUpdate(
     {
       contestNumber: req.params.contestNumber,
@@ -137,6 +145,48 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
   );
 
   if (!result) {
-    return next(new AppError('Question not found', 404));
+    return next(new AppError('Result not found', 404));
+  }
+});
+
+exports.updateDSAResult = catchAsync(async (req, res, next) => {
+  const profile = await Profile.findOne({ usn: req.params.usn });
+
+  if (!profile) {
+    return next(new AppError('Profile not found', 404));
+  }
+
+  const contest = profile.DSAEachPoints.some(
+    (content) => content.contestNumber === req.params.contestNumber
+  );
+
+  if (contest) {
+    return next();
+  }
+
+  const result = await Result.findOneAndUpdate(
+    {
+      contestNumber: req.params.contestNumber,
+      contestName: req.body.contestName,
+    },
+    {
+      $push: {
+        Results: {
+          usn: req.params.usn,
+          name: profile.name,
+          branch: profile.branch,
+          points: req.body.points,
+          timeLeft: req.body.timeLeft,
+        },
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!result) {
+    return next(new AppError('Result not found', 404));
   }
 });

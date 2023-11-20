@@ -40,6 +40,22 @@ exports.createProfile = catchAsync(async (req, res, next) => {
 });
 
 exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
+  const AptitudeProfile = await Profile.findOne({
+    usn: req.params.usn,
+  });
+
+  if (!AptitudeProfile) {
+    return next(new AppError('Profile not found', 404));
+  }
+
+  const contest = AptitudeProfile.AptitudeEachPoints.some(
+    (profile) => profile.contestNumber === req.params.contestNumber
+  );
+
+  if (contest) {
+    return next();
+  }
+
   const profile = await Profile.findOneAndUpdate(
     {
       usn: req.params.usn,
@@ -50,6 +66,57 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
       },
       $push: {
         AptitudeEachPoints: {
+          contestNumber: req.params.contestNumber,
+          contestName: req.body.contestName,
+          points: req.body.points,
+        },
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  console.log(profile);
+  if (!profile) {
+    return next(new AppError('Profile not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    profile: profile,
+  });
+
+  next();
+});
+
+exports.updateDSAProfile = catchAsync(async (req, res, next) => {
+  const DSAProfile = await Profile.findOne({
+    usn: req.params.usn,
+  });
+
+  if (!DSAProfile) {
+    return next(new AppError('Profile not found', 404));
+  }
+
+  const contest = DSAProfile.DSAEachPoints.some(
+    (profile) => profile.contestNumber === req.params.contestNumber
+  );
+
+  if (contest) {
+    return next();
+  }
+
+  const profile = await Profile.findOneAndUpdate(
+    {
+      usn: req.params.usn,
+    },
+    {
+      $inc: {
+        DSAPoints: req.body.points,
+      },
+      $push: {
+        DSAEachPoints: {
           contestNumber: req.params.contestNumber,
           contestName: req.body.contestName,
           points: req.body.points,

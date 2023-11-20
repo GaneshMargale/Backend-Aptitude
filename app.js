@@ -8,8 +8,8 @@ const resultRouter = require('./Routes/resultRoutes');
 const aptitudeRouter = require('./Routes/aptitudeRoutes');
 const profileRouter = require('./Routes/profileRoutes');
 const leaderShipRouter = require('./Routes/leaderShipRoutes');
-// const dsaRouter = require('./Routes/dsaRoutes');
-// const programRouter = require('./Routes/programRoutes');
+const dsaRouter = require('./Routes/dsaRoutes');
+const programRouter = require('./Routes/programRoutes');
 
 const app = express();
 
@@ -39,8 +39,8 @@ app.use('/api/v1/aptitude-dsa/result', resultRouter);
 app.use('/api/v1/aptitude-dsa/question-answers', aptitudeRouter);
 app.use('/api/v1/aptitude-dsa/profile', profileRouter);
 app.use('/api/v1/aptitude-dsa/leaderShip', leaderShipRouter);
-// app.use('/api/v1/aptitude-dsa/dsa', dsaRouter);
-// app.use('/api/v1/aptitude-dsa/program/complie', programRouter);
+app.use('/api/v1/aptitude-dsa/dsa', dsaRouter);
+app.use('/api/v1/aptitude-dsa/program/complie', programRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

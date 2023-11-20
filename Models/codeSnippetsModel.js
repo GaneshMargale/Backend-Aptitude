@@ -11,41 +11,22 @@ const codeSnippitsSchema = new mongoose.Schema({
     required: [true, 'Provide contest name'],
   },
 
-  staterFiles: {
-    java: {
-      q1: String,
-      q2: String,
-      q3: String,
+  starterCode: [
+    {
+      java: {
+        type: String,
+        required: [true, 'Provide java starter code'],
+      },
+      cpp: {
+        type: String,
+        required: [true, 'Provide cpp starter code'],
+      },
+      python: {
+        type: String,
+        required: [true, 'Provide python starter code'],
+      },
     },
-    python: {
-      q1: String,
-      q2: String,
-      q3: String,
-    },
-    cpp: {
-      q1: String,
-      q2: String,
-      q3: String,
-    },
-  },
-
-  mainFiles: {
-    java: {
-      q1: String,
-      q2: String,
-      q3: String,
-    },
-    python: {
-      q1: String,
-      q2: String,
-      q3: String,
-    },
-    cpp: {
-      q1: String,
-      q2: String,
-      q3: String,
-    },
-  },
+  ],
 });
 
 const CodeSnippits = mongoose.model('codeSnippits', codeSnippitsSchema);

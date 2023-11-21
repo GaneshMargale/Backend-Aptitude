@@ -24,4 +24,10 @@ router
   .delete(dsaController.deleteDSAQuestions);
 
 router.route('/previousQuestions').get(dsaController.getPreviousDSA);
+
+router
+  .route('/getStarter')
+  .get(dsaController.getStarter)
+  .post(dsaController.createStarter);
+
 module.exports = router;

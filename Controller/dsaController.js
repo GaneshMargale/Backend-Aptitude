@@ -5,6 +5,7 @@ const CodeSnippits = require('../Models/codeSnippetsModel');
 const DSAPrevious = require('../Models/dsaPrevModel');
 const DSAQuestions = require('../Models/dsaModel');
 const TestCases = require('../Models/testModel');
+const Starter = require('../Models/starterModel');
 
 exports.getCodeSnippits = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(CodeSnippits.find(), req.query)
@@ -123,5 +124,31 @@ exports.deleteDSAQuestions = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: 'success',
     data: null,
+  });
+});
+
+exports.getStarter = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Starter.find(), req.query)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  const results = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      results,
+    },
+  });
+});
+
+exports.createStarter = catchAsync(async (req, res, next) => {
+  const newStarter = await Starter.create(req.body);
+
+  res.status(200).json({
+    status: 'success',
+    starter: newStarter,
   });
 });

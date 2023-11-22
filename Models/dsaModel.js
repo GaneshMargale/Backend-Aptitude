@@ -20,15 +20,27 @@ const DSASchema = new mongoose.Schema({
         type: String,
         required: [true, 'Provide the question description'],
       },
-      TestCase1: {
+      Input1: {
         type: String,
         required: [true, 'Provide the test case 1'],
       },
-      TestCase2: {
+      Output1: {
+        type: String,
+        required: [true, 'Provide the test case 1'],
+      },
+      Input2: {
         type: String,
         required: [true, 'Provide the test case 2'],
       },
-      TestCase3: {
+      Output2: {
+        type: String,
+        required: [true, 'Provide the test case 2'],
+      },
+      Input3: {
+        type: String,
+        required: [true, 'Provide the test case 3'],
+      },
+      Output3: {
         type: String,
         required: [true, 'Provide the test case 3'],
       },

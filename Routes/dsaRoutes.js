@@ -1,11 +1,12 @@
 const express = require('express');
 const dsaController = require('../Controller/dsaController');
+const authController = require('../Controller/authController');
 
 const router = express.Router();
 
 router
   .route('/')
-  .get(dsaController.getCodeSnippits)
+  .get(authController.protect, dsaController.getCodeSnippits)
   .post(dsaController.createCodeSnippits);
 
 router
@@ -16,18 +17,20 @@ router.route('/CreateTestCase').post(dsaController.createTestCases);
 
 router
   .route('/questions')
-  .get(dsaController.getDSAQuestions)
+  .get(authController.protect, dsaController.getDSAQuestions)
   .post(dsaController.createDSAQuestions);
 
 router
   .route('/questions/:contestNumber')
   .delete(dsaController.deleteDSAQuestions);
 
-router.route('/previousQuestions').get(dsaController.getPreviousDSA);
+router
+  .route('/previousQuestions')
+  .get(authController.protect, dsaController.getPreviousDSA);
 
 router
   .route('/getStarter')
-  .get(dsaController.getStarter)
+  .get(authController.protect, dsaController.getStarter)
   .post(dsaController.createStarter);
 
 module.exports = router;

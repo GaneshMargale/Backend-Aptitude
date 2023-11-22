@@ -2,6 +2,7 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Profile = require('../Models/userProfileModel');
+const User = require('../Models/userModel');
 
 exports.getUserProfile = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({
@@ -17,6 +18,39 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
     data: {
       profile: profile,
     },
+  });
+});
+
+exports.getUserProfileDetails = catchAsync(async (req, res, next) => {
+  const profiles = await Profile.find();
+
+  const userProfile = [];
+
+  for (const document of profiles) {
+    const user = await User.findOne({ usn: document.usn });
+
+    if (!user) {
+      continue;
+    }
+
+    const currentUser = {
+      name: document.name,
+      usn: document.usn,
+      branch: document.branch,
+      contact: user.contact,
+      email: user.email,
+      DSAPoints: document.DSAPoints,
+      AptitudePoints: document.AptitudePoints,
+      DSAEachPoints: document.DSAEachPoints,
+      AptitudeEachPoints: document.AptitudeEachPoints,
+    };
+
+    userProfile.push(currentUser);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    Profiles: userProfile,
   });
 });
 

@@ -85,7 +85,7 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
   );
 
   if (contest) {
-    return next();
+    return next(new AppError('contest already exists', 404));
   }
 
   const profile = await Profile.findOneAndUpdate(

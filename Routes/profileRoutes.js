@@ -12,6 +12,6 @@ router.route('/:contestNumber/:usn').patch(
   resultController.updateAptitudeResult
 );
 
-router.route('/').get(profileController.getUserProfileDetails);
+router.route('/:usn').post(profileController.getUserProfileDetails);
 
 module.exports = router;

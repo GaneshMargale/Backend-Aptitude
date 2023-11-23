@@ -84,6 +84,8 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
     (profile) => profile.contestNumber === req.params.contestNumber
   );
 
+  // AptitudeProfile.AptitudeEachPoints.forEach((document) => {});
+
   if (contest) {
     return next(new AppError('contest already exists', 404));
   }

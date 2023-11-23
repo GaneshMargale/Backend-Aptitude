@@ -22,35 +22,33 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
 });
 
 exports.getUserProfileDetails = catchAsync(async (req, res, next) => {
-  const profiles = await Profile.find();
+  const profile = await Profile.findOne({ usn: req.params.usn });
 
-  const userProfile = [];
+  const user = await User.findOne({ usn: req.params.usn });
 
-  for (const document of profiles) {
-    const user = await User.findOne({ usn: document.usn });
-
-    if (!user) {
-      continue;
-    }
-
-    const currentUser = {
-      name: document.name,
-      usn: document.usn,
-      branch: document.branch,
-      contact: user.contact,
-      email: user.email,
-      DSAPoints: document.DSAPoints,
-      AptitudePoints: document.AptitudePoints,
-      DSAEachPoints: document.DSAEachPoints,
-      AptitudeEachPoints: document.AptitudeEachPoints,
-    };
-
-    userProfile.push(currentUser);
+  if (!user) {
+    return next(new AppError('User not found', 404));
   }
+
+  if (!profile) {
+    return next(new AppError('User not found', 404));
+  }
+
+  const currentUser = {
+    name: profile.name,
+    usn: profile.usn,
+    branch: profile.branch,
+    contact: user.contact,
+    email: user.email,
+    DSAPoints: profile.DSAPoints,
+    AptitudePoints: profile.AptitudePoints,
+    DSAEachPoints: profile.DSAEachPoints,
+    AptitudeEachPoints: profile.AptitudeEachPoints,
+  };
 
   res.status(200).json({
     status: 'success',
-    Profiles: userProfile,
+    Profiles: currentUser,
   });
 });
 

@@ -84,6 +84,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const CodeSnippet = require('../Models/codeSnippetsModel');
 const TestCases = require('../Models/testModel');
+const javaPath = `${__dirname}/../lib/java/bin`;
 
 // Run Java program and test
 exports.runProgram = catchAsync(async (req, res, next) => {
@@ -156,7 +157,7 @@ function compileAndRunJava(
   const classpath = __dirname + '\\..\\Java';
 
   console.log(classpath);
-  const javaProcess = spawn('java', ['-cp', classpath, mainClass]);
+  const javaProcess = spawn(`${javaPath}\\java`, ['-cp', classpath, mainClass]);
 
   let output = '';
   let testResults = [];

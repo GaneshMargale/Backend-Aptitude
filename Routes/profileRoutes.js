@@ -6,12 +6,17 @@ const router = express.Router();
 
 // router.route('/').post(profileController.createProfile);
 
-router.route('/:contestNumber/:usn').patch(
-  // resultController.createResult,
-  profileController.updateAptitudeProfile,
-  resultController.updateAptitudeResult
-);
+router
+  .route('aptitude/:contestNumber/:usn')
+  .patch(
+    profileController.updateAptitudeProfile,
+    resultController.updateAptitudeResult
+  );
 
-router.route('/:usn').post(profileController.getUserProfileDetails);
+router
+  .route('dsa/:contestNumber/:usn')
+  .patch(profileController.updateDSAProfile, resultController.updateDSAResult);
+
+router.route('/:usn').get(profileController.getUserProfileDetails);
 
 module.exports = router;

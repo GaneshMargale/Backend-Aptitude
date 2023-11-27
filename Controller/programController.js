@@ -1,259 +1,125 @@
-// const APIFeatures = require('../utils/apiFeatures');
-// const catchAsync = require('../utils/catchAsync');
-// const AppError = require('../utils/appError');
-// const fs = require('fs');
-// const { spawn } = require('child_process');
-// const CodeSnippet = require('../Models/codeSnippetsModel');
-// const TestCases = require('../Models/testModel');
-
-// exports.runProgram = catchAsync(async (req, res, next) => {
-//   const language = req.params.language;
-//   const qNumber = req.params.qNumber;
-
-//   const main = await CodeSnippet.findOne({
-//     contestNumber: req.params.contestNumber,
-//     [`starterCode.${qNumber - 1}.${language}`]: {
-//       $exists: true,
-//     },
-//   });
-
-//   if (!main) {
-//     return next(new AppError('File not found', 404));
-//   }
-
-//   const solutionfilePath = `C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java\\Solution.java`;
-//   const mainFilePath =
-//     'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java\\Main.java';
-
-//   try {
-//     fs.writeFileSync(mainFilePath, main.starterCode[qNumber - 1][language]);
-//     fs.writeFileSync(solutionfilePath, req.body.solution, 'utf-8');
-
-//     const javacProcess = spawn('javac', [mainFilePath, solutionfilePath]);
-
-//     javacProcess.stdout.on('data', (data) => {
-//       console.log(`Compilation output: ${data}`);
-//     });
-
-//     javacProcess.stderr.on('data', (data) => {
-//       console.error(`Compilation error: ${data}`);
-//     });
-
-//     javacProcess.on('close', (code) => {
-//       if (code === 0) {
-//         console.log('Compilation completed successfully.');
-
-//         const mainClass = 'Main';
-//         const classpath =
-//           'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java';
-//         const javaProcess = spawn('java', ['-cp', classpath, mainClass]);
-
-//         javaProcess.stdout.on('data', (data) => {
-//           console.log(`Java program output: ${data}`);
-//         });
-
-//         javaProcess.stderr.on('data', (data) => {
-//           console.error(`Error running Java program: ${data}`);
-//         });
-
-//         javaProcess.on('close', (code) => {
-//           if (code === 0) {
-//             console.log('Java program execution complete.');
-//           } else {
-//             console.error(`Java program execution exited with code ${code}`);
-//           }
-//         });
-//       } else {
-//         console.error(`Compilation exited with code ${code}`);
-//       }
-//     });
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'File successfully updated.',
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return next(new AppError('Error writing to file', 500));
-//   }
-// });
-
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const CodeSnippet = require('../Models/codeSnippetsModel');
 const TestCases = require('../Models/testModel');
-const javaPath = `${__dirname}/../lib/java/bin`;
+const javaPath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
 
-// Run Java program and test
+function compareOutput(test, output) {
+  if (!test || !test.length) {
+    console.error('Invalid test object or empty test array.');
+    return;
+  }
+
+  let outputResponse = [];
+  const testOutputs = test.map((testCase) => testCase.testOutput);
+
+  for (let index = 0; index < testOutputs.length; index++) {
+    const expected = testOutputs[index];
+    const actual = Number(output[index]);
+
+    const isTestCaseCorrect = expected[0] === actual;
+    const response = {
+      TestCase: index + 1,
+      Expected: expected[0],
+      Actual: actual,
+      Result: isTestCaseCorrect ? 'Pass' : 'Fail',
+    };
+
+    outputResponse.push(response);
+  }
+
+  return outputResponse;
+}
+
+function createInputFile(test, inputFilePath) {
+  const testInputs = test.testCases.map((testCase) => testCase.testInput);
+
+  fs.writeFileSync(
+    inputFilePath,
+    testInputs.map((input) => input.join(' ')).join('\n')
+  );
+}
+
+function complieAndRun(
+  mainFilePath,
+  solutionFilePath,
+  inputFilePath,
+  test,
+  res
+) {
+  const javacProcess = spawn(`${javaPath}/javac`, [
+    mainFilePath,
+    solutionFilePath,
+  ]);
+
+  javacProcess.on('close', (code) => {
+    if (code !== 0) {
+      return next(new AppError('Compliation failed: ' + code));
+    }
+
+    let output = [];
+    let result;
+    const classPath = `${__dirname}/../Java`;
+    const javaProcess = spawn(`${javaPath}/java`, ['-cp', classPath, 'Main']);
+
+    javaProcess.stdout.on('data', (data) => {
+      const newData = data.toString().trim().split('\n');
+      output.push(...newData);
+      output = output.map((line) => line.replace(/\r?\n|\r/g, ''));
+      result = compareOutput(test, output);
+    });
+
+    javaProcess.on('close', (code) => {
+      if (code === 0) {
+        res.status(200).json({
+          status: 'success',
+          message: 'Java program execution complete.',
+          results: result,
+        });
+      } else {
+        res.status(404).json({
+          status: 'fail',
+          message: `Java program execution exited with code ${code}`,
+        });
+      }
+    });
+  });
+}
+
 exports.runProgram = catchAsync(async (req, res, next) => {
-  const language = req.params.language;
-  const qNumber = req.params.qNumber;
-
   const main = await CodeSnippet.findOne({
     contestNumber: req.params.contestNumber,
-    [`starterCode.${qNumber - 1}.${language}`]: {
-      $exists: true,
-    },
   });
 
   if (!main) {
-    return next(new AppError('File not found', 404));
+    return next(new AppError('Contest not found', 404));
   }
 
   const test = await TestCases.findOne({
-    questionNumber: qNumber,
+    questionNumber: req.params.qNumber,
   });
 
-  const solutionFilePath = __dirname + '\\..\\Java\\Solution.java';
-  // 'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java\\Solution.java';
-  const mainFilePath = __dirname + '\\..\\Java\\Main.java';
-  // 'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java\\Main.java';
-  const inputFilePath = __dirname + '\\..\\Java\\input.txt';
-  // 'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java\\input.txt';
+  const solutionFilePath = __dirname + '/../Java/Solution.java';
+  const mainFilePath = __dirname + '/../Java/Main.java';
+  const inputFilePath = __dirname + '/../Java/input.txt';
 
   try {
-    fs.writeFileSync(mainFilePath, main.starterCode[qNumber - 1][language]);
-    fs.writeFileSync(solutionFilePath, req.body.solution, 'utf-8');
-    createInputFile(inputFilePath, test.testCases);
-    compileAndRunJava(
+    fs.writeFileSync(
+      mainFilePath,
+      main.starterCode[req.params.qNumber - 1][req.params.language]
+    );
+
+    fs.writeFileSync(solutionFilePath, req.body.solution);
+
+    createInputFile(test, inputFilePath);
+    complieAndRun(
       mainFilePath,
       solutionFilePath,
       inputFilePath,
       test.testCases,
       res
     );
-  } catch (error) {
-    console.error(error);
-    return next(new AppError('Error writing to file', 500));
-  }
+  } catch (e) {}
 });
-
-function createInputFile(inputFilePath, testCases) {
-  let inputContent = '';
-
-  testCases.forEach((testCase) => {
-    const testInput = testCase.testInput
-      .map((input) => input.toString())
-      .join(' ');
-    inputContent += `${testInput}\n`;
-  });
-
-  fs.writeFileSync(inputFilePath, inputContent, 'utf-8');
-  console.log('Input file created:', inputFilePath);
-}
-
-function compileAndRunJava(
-  mainFilePath,
-  solutionFilePath,
-  inputFilePath,
-  testCases,
-  res
-) {
-  const mainClass = 'Main';
-  // const classpath = 'C:\\Users\\Asus\\OneDrive\\Desktop\\Aptitude-DSA\\Java';
-  // const classpath = `${__dirname}/../../Java`;
-  const classpath = __dirname + '\\..\\Java';
-
-  console.log(classpath);
-  const javaProcess = spawn(`${javaPath}\\java`, ['-cp', classpath, mainClass]);
-
-  let output = '';
-  let testResults = [];
-
-  javaProcess.stdout.on('data', (data) => {
-    output += data.toString();
-
-    while (output.includes('\n')) {
-      const index = output.indexOf('\n');
-      const line = output.slice(0, index);
-      output = output.slice(index + 1);
-
-      const testResult = compareOutputWithTestCase(
-        line,
-        testCases[testResults.length]
-      );
-
-      testResults.push(testResult);
-
-      if (testResults.length === testCases.length) {
-        // All test cases processed, stop reading
-        javaProcess.stdout.removeAllListeners('data');
-        break;
-      }
-    }
-  });
-
-  javaProcess.stderr.on('data', (data) => {
-    console.error(`Error running Java program: ${data}`);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error running Java program',
-    });
-    javaProcess.kill();
-  });
-
-  javaProcess.on('close', (code) => {
-    if (code === 0) {
-      console.log('Java program execution complete.');
-    } else {
-      console.error(`Java program execution exited with code ${code}`);
-    }
-
-    if (testResults.length < testCases.length) {
-      console.error('Not all test cases were processed.');
-    }
-
-    if (testResults.every((result) => result.passed)) {
-      res.status(200).json({
-        status: 'success',
-        message: 'File successfully updated.',
-      });
-    } else {
-      res.status(400).json({
-        status: 'fail',
-        message: 'Some test cases failed.',
-        results: testResults,
-      });
-    }
-  });
-
-  const inputReadStream = fs.createReadStream(inputFilePath);
-
-  inputReadStream.on('end', () => {
-    inputReadStream.close();
-  });
-
-  inputReadStream.pipe(javaProcess.stdin);
-}
-
-function compareOutputWithTestCase(output, testCase) {
-  if (!testCase || !testCase.testOutput) {
-    console.error(
-      'Invalid test case structure or undefined testCase:',
-      testCase
-    );
-    return {
-      passed: false,
-      expected: 'Invalid test case structure',
-      actual: output,
-    };
-  }
-
-  const expectedOutput = testCase.testOutput
-    .map((output) => output.toString())
-    .join(' ');
-
-  if (output.trim() === expectedOutput.trim()) {
-    console.log(
-      `Test case passed. Expected: ${expectedOutput}, Actual: ${output}`
-    );
-    return { passed: true };
-  } else {
-    console.error(
-      `Test case failed. Expected: ${expectedOutput}, Actual: ${output}`
-    );
-    return { passed: false, expected: expectedOutput, actual: output };
-  }
-}

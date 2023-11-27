@@ -80,14 +80,12 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
     return next(new AppError('Profile not found', 404));
   }
 
-  const contest = AptitudeProfile.AptitudeEachPoints.some(
-    (profile) => profile.contestNumber === req.params.contestNumber
-  );
-
-  // AptitudeProfile.AptitudeEachPoints.forEach((document) => {});
-
-  if (contest) {
-    return next(new AppError('contest already exists', 404));
+  if (
+    AptitudeProfile.AptitudeEachPoints.some(
+      (document) => Number(req.params.contestNumber) === document.contestNumber
+    )
+  ) {
+    return next();
   }
 
   const profile = await Profile.findOneAndUpdate(
@@ -111,7 +109,6 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
-  console.log(profile);
   if (!profile) {
     return next(new AppError('Profile not found', 404));
   }
@@ -133,11 +130,11 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
     return next(new AppError('Profile not found', 404));
   }
 
-  const contest = DSAProfile.DSAEachPoints.some(
-    (profile) => profile.contestNumber === req.params.contestNumber
-  );
-
-  if (contest) {
+  if (
+    DSAProfile.DSAEachPoints.some(
+      (document) => Number(req.params.contestNumber) === document.contestNumber
+    )
+  ) {
     return next();
   }
 

@@ -109,16 +109,16 @@ exports.deleteResult = catchAsync(async (req, res, next) => {
 
 exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({ usn: req.params.usn });
+  const resultCheck = await Result.find();
 
   if (!profile) {
     return next(new AppError('Profile not found', 404));
   }
 
-  const contest = profile.AptitudeEachPoints.some(
-    (content) => content.contestNumber === req.params.contestNumber
-  );
-
-  if (contest) {
+  if (
+    req.body.contestName === resultCheck.contestName &&
+    resultCheck.Results.some((document) => req.params.usn === document.usn)
+  ) {
     return next();
   }
 
@@ -151,16 +151,16 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
 
 exports.updateDSAResult = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({ usn: req.params.usn });
+  const resultCheck = await Result.find();
 
   if (!profile) {
     return next(new AppError('Profile not found', 404));
   }
 
-  const contest = profile.DSAEachPoints.some(
-    (content) => content.contestNumber === req.params.contestNumber
-  );
-
-  if (contest) {
+  if (
+    req.body.contestName === resultCheck.contestName &&
+    resultCheck.Results.some((document) => req.params.usn === document.usn)
+  ) {
     return next();
   }
 

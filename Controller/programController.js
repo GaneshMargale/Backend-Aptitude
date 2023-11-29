@@ -4,12 +4,10 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const CodeSnippet = require('../Models/codeSnippetsModel');
 const TestCases = require('../Models/testModel');
-const javaPath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
 
 function compareOutput(test, output) {
   if (!test || !test.length) {
-    console.error('Invalid test object or empty test array.');
-    return;
+    throw new Error('Invalid test object or empty test array.');
   }
 
   let outputResponse = [];
@@ -49,20 +47,43 @@ function complieAndRun(
   test,
   res
 ) {
-  const javacProcess = spawn(`${javaPath}/javac`, [
+  const javaExecutablePath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
+  let responseSent = false;
+
+  const javacProcess = spawn(`${javaExecutablePath}/javac`, [
     mainFilePath,
     solutionFilePath,
   ]);
 
+  javacProcess.stderr.on('data', (data) => {
+    if (!responseSent) {
+      res.status(500).json({
+        status: 'error',
+        message: `Compilation Error: ${data.toString()}`,
+      });
+    }
+    responseSent = true;
+  });
+
   javacProcess.on('close', (code) => {
     if (code !== 0) {
-      return next(new AppError('Compliation failed: ' + code));
+      if (!responseSent) {
+        return res.status(500).json({
+          status: 'error',
+          message: `Compilation failed with code ${code}`,
+        });
+      }
+      responseSent = true;
     }
 
     let output = [];
     let result;
     const classPath = `${__dirname}/../Java`;
-    const javaProcess = spawn(`${javaPath}/java`, ['-cp', classPath, 'Main']);
+    const javaProcess = spawn(`${javaExecutablePath}/java`, [
+      '-cp',
+      classPath,
+      'Main',
+    ]);
 
     javaProcess.stdout.on('data', (data) => {
       const newData = data.toString().trim().split('\n');
@@ -71,18 +92,34 @@ function complieAndRun(
       result = compareOutput(test, output);
     });
 
+    javaProcess.stderr.on('data', (data) => {
+      res.status(500).json({
+        status: 'error',
+        message: `Execution Error: ${data.toString()}`,
+      });
+    });
+
     javaProcess.on('close', (code) => {
       if (code === 0) {
-        res.status(200).json({
-          status: 'success',
-          message: 'Java program execution complete.',
-          results: result,
-        });
+        fs.unlinkSync(mainFilePath);
+        fs.unlinkSync(solutionFilePath);
+        fs.unlinkSync(inputFilePath);
+        if (!responseSent) {
+          res.status(200).json({
+            status: 'success',
+            message: 'Java program execution complete.',
+            results: result,
+          });
+        }
+        responseSent = true;
       } else {
-        res.status(404).json({
-          status: 'fail',
-          message: `Java program execution exited with code ${code}`,
-        });
+        if (!responseSent) {
+          res.status(404).json({
+            status: 'fail',
+            message: `Java program execution exited with code ${code}`,
+          });
+        }
+        responseSent = true;
       }
     });
   });
@@ -121,5 +158,11 @@ exports.runProgram = catchAsync(async (req, res, next) => {
       test.testCases,
       res
     );
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal Server Error',
+    });
+  }
 });

@@ -159,7 +159,7 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
-  console.log(profile);
+
   if (!profile) {
     return next(new AppError('Profile not found', 404));
   }

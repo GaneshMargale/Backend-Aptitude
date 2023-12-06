@@ -7,14 +7,14 @@ const router = express.Router();
 // router.route('/').post(profileController.createProfile);
 
 router
-  .route('aptitude/:contestNumber/:usn')
+  .route('/aptitude/:contestNumber/:usn')
   .patch(
     profileController.updateAptitudeProfile,
     resultController.updateAptitudeResult
   );
 
 router
-  .route('dsa/:contestNumber/:usn')
+  .route('/dsa/:contestNumber/:usn')
   .patch(profileController.updateDSAProfile, resultController.updateDSAResult);
 
 router.route('/:usn').get(profileController.getUserProfileDetails);

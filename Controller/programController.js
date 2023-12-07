@@ -11,15 +11,18 @@ function compareOutput(test, output) {
   }
 
   let outputResponse = [];
+  const testInputs = test.map((testInput) => testInput.testInput);
   const testOutputs = test.map((testCase) => testCase.testOutput);
 
   for (let index = 0; index < testOutputs.length; index++) {
     const expected = testOutputs[index];
+    const inputs = testInputs[index];
     const actual = Number(output[index]);
 
     const isTestCaseCorrect = expected[0] === actual;
     const response = {
       TestCase: index + 1,
+      Input: inputs,
       Expected: expected[0],
       Actual: actual,
       Result: isTestCaseCorrect ? 'Pass' : 'Fail',

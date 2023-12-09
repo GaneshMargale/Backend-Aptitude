@@ -109,7 +109,9 @@ exports.deleteResult = catchAsync(async (req, res, next) => {
 
 exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({ usn: req.params.usn });
-  const resultCheck = await Result.find();
+  const resultCheck = await Result.findOne({
+    contestName: req.body.contestName,
+  });
 
   if (!profile) {
     return next(new AppError('Profile not found', 404));
@@ -119,7 +121,9 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
     req.body.contestName === resultCheck.contestName &&
     resultCheck.Results.some((document) => req.params.usn === document.usn)
   ) {
-    return next();
+    return res.status(200).json({
+      status: 'success',
+    });
   }
 
   const result = await Result.findOneAndUpdate(
@@ -151,7 +155,9 @@ exports.updateAptitudeResult = catchAsync(async (req, res, next) => {
 
 exports.updateDSAResult = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({ usn: req.params.usn });
-  const resultCheck = await Result.find();
+  const resultCheck = await Result.findOne({
+    contestName: req.body.contestName,
+  });
 
   if (!profile) {
     return next(new AppError('Profile not found', 404));
@@ -161,7 +167,9 @@ exports.updateDSAResult = catchAsync(async (req, res, next) => {
     req.body.contestName === resultCheck.contestName &&
     resultCheck.Results.some((document) => req.params.usn === document.usn)
   ) {
-    return next();
+    return res.status(200).json({
+      status: 'success',
+    });
   }
 
   const result = await Result.findOneAndUpdate(

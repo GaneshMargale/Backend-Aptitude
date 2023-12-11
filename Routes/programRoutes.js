@@ -11,4 +11,8 @@ router
   .route('/cpp/:contestNumber/:language/:qNumber')
   .post(programController.runProgramCpp);
 
+router
+  .route('/py/:contestNumber/:language/:qNumber')
+  .post(programController.runProgramPython);
+
 module.exports = router;

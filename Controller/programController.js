@@ -51,6 +51,11 @@ function complieAndRun(
   res
 ) {
   const javaExecutablePath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
+  if (fs.existsSync(javaExecutablePath)) {
+    console.log(`The directory ${javaExecutablePath} exists.`);
+  } else {
+    return new AppError(`The directory ${javaExecutablePath} does not exist.`);
+  }
   let responseSent = false;
 
   const javacProcess = spawn(`${javaExecutablePath}/javac`, [

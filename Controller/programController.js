@@ -1,19 +1,9 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const fs = require('fs');
-const { spawn, spawnSync } = require('child_process');
+const { spawn } = require('child_process');
 const CodeSnippet = require('../Models/codeSnippetsModel');
 const TestCases = require('../Models/testModel');
-
-function findJavaExecutable() {
-  const javaExecutable = spawnSync('which', ['java']).stdout.toString().trim();
-
-  if (!javaExecutable) {
-    throw new AppError('Java executable not found.');
-  }
-
-  return javaExecutable.replace('/bin/java', '');
-}
 
 function compareOutput(test, output) {
   if (!test || !test.length) {
@@ -60,28 +50,7 @@ function complieAndRun(
   test,
   res
 ) {
-  // const javaExecutablePath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
-  // // const javaExecutablePath = process.env.JAVA_HOME;
-  // if (fs.existsSync(javaExecutablePath)) {
-  //   console.log(`The directory ${javaExecutablePath} exists.`);
-  // } else {
-  //   return new AppError(`The directory ${javaExecutablePath} does not exist.`);
-  // }
-  // let responseSent = false;
-
-  // // const javacProcess = spawn(`${javaExecutablePath}/javac`, [
-  // //   mainFilePath,
-  // //   solutionFilePath,
-  // // ]);
-
-  // const javacProcess = spawn(`${__dirname}/../lib/Java/jdk-1.8/bin/javac`, [
-  //   mainFilePath,
-  //   solutionFilePath,
-  // ]);
-
-  const javaExecutablePath = findJavaExecutable();
-  console.log(`Java executable found at: ${javaExecutablePath}`);
-
+  const javaExecutablePath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
   let responseSent = false;
 
   const javacProcess = spawn(`${javaExecutablePath}/javac`, [

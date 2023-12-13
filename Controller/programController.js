@@ -104,9 +104,9 @@ function complieAndRun(
 
     javaProcess.on('close', (code) => {
       if (code === 0) {
-        fs.unlinkSync(mainFilePath);
-        fs.unlinkSync(solutionFilePath);
-        fs.unlinkSync(inputFilePath);
+        // fs.unlinkSync(mainFilePath);
+        // fs.unlinkSync(solutionFilePath);
+        // fs.unlinkSync(inputFilePath);
         if (!responseSent) {
           res.status(200).json({
             status: 'success',

@@ -1,0 +1,28 @@
+services:
+  mongo_db:
+    container_name: db_container
+    image: mongo:latest
+    restart: always
+    ports:
+      - '2717:27017'
+    volumes:
+      - mongo_db:/data/db
+
+  api:
+    build: .
+    ports:
+      - '4000:3000'
+    volumes:
+      - .:/server
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE: mongodb+srv://ganesh:<PASSWORD>@cluster0.s575u7x.mongodb.net/aptitude-dsa?retryWrites=true&w=majority
+      DATABASE_PASSWORD: ZEQiBmwcCNvA8izX
+      JWT_SECRET: ganesh-margale-backend-dsa-aptitude-secret
+      JWT_EXPIRES_IN: 5000
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}

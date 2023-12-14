@@ -2,16 +2,21 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Aptitude = require('../Models/aptitudeModel');
+const Profile = require('../Models/userProfileModel');
 const Answer = require('../Models/answerModel');
 
 exports.getAllQuestions = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Aptitude.find(), req.query)
-    .filter()
-    .sort()
-    .fields()
-    .paginate();
+  // const features = new APIFeatures(Aptitude.find(), req.query)
+  //   .filter()
+  //   .sort()
+  //   .fields()
+  //   .paginate();
+  const questions = await Aptitude.findOne({
+    contestNumber: req.params.contestNumber,
+    contestName: req.params.contestName,
+  });
 
-  const questions = await features.query;
+  // const questions = await features.query;
   res.status(200).json({
     status: 'success',
     results: questions.length,
@@ -107,22 +112,100 @@ exports.createAnswers = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getContests = catchAsync(async (req, res, next) => {
-  const contests = await Aptitude.find();
-  let contest = [];
+// exports.getContests = catchAsync(async (req, res, next) => {
+//   const contests = await Aptitude.find();
+//   let contest = [];
 
-  contests.forEach((document) =>
-    contest.push({
-      contestNumber: document.contestNumber,
-      contestName: document.contestName,
-    })
-  );
+//   contests.forEach((document) =>
+//     contest.push({
+//       contestNumber: document.contestNumber,
+//       contestName: document.contestName,
+//     })
+//   );
+
+//   res.status(200).json({
+//     status: 'success',
+//     contests: contest.length,
+//     data: {
+//       Contest: contest,
+//     },
+//   });
+// });
+
+exports.getAptitudeContests = catchAsync(async (req, res, next) => {
+  const profile = await Profile.findOne({ usn: req.params.usn });
+
+  if (!profile) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Profile not found',
+    });
+  }
+
+  const contests = profile.AptitudeEachPoints;
 
   res.status(200).json({
     status: 'success',
-    contests: contest.length,
+    contests: contests.length,
     data: {
-      Contest: contest,
+      Contest: contests,
     },
   });
+});
+
+exports.getDSAContests = catchAsync(async (req, res, next) => {
+  const profile = await Profile.findOne({ usn: req.params.usn });
+
+  if (!profile) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Profile not found',
+    });
+  }
+
+  const contests = profile.DSAEachPoints;
+
+  res.status(200).json({
+    status: 'success',
+    contests: contests.length,
+    data: {
+      Contest: contests,
+    },
+  });
+});
+
+exports.updateQuestionVisibility = catchAsync(async (req, res, next) => {
+  const question = await Aptitude.findOne({
+    contestNumber: req.params.contestNumber,
+    contestName: req.params.contestName,
+  });
+
+  if (!question) {
+    return next(new AppError('Question not found', 404));
+  }
+
+  const currentTime = new Date();
+
+  const questionTime = new Date(question.time);
+  questionTime.setSeconds(0, 0);
+
+  if (currentTime >= questionTime) {
+    await Aptitude.findOneAndUpdate(
+      {
+        contestNumber: req.params.contestNumber,
+        contestName: req.params.contestName,
+      },
+      {
+        $set: {
+          visibility: true,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  }
+
+  next();
 });

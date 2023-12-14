@@ -6,9 +6,14 @@ const authController = require('../Controller/authController');
 const router = express.Router();
 
 router
-  .route('/questions')
-  .get(authController.protect, aptitudeController.getAllQuestions)
-  .post(aptitudeController.createQuestions);
+  .route('/questions/:contestNumber/:contestName')
+  .get(
+    authController.protect,
+    aptitudeController.updateQuestionVisibility,
+    aptitudeController.getAllQuestions
+  );
+
+router.route('/questions').post(aptitudeController.createQuestions);
 
 router
   .route('/answers')
@@ -23,5 +28,9 @@ router
 router.route('/CreateQnA').get(QnAController.getQnA);
 router.route('/GetQnA').get(authController.protect, QnAController.getAllQnA);
 
-router.route('/aptitude/contests').get(aptitudeController.getContests);
+router
+  .route('/aptitude/contests/:usn')
+  .get(aptitudeController.getAptitudeContests);
+
+router.route('/dsa/contests/:usn').get(aptitudeController.getDSAContests);
 module.exports = router;

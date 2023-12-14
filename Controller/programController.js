@@ -50,7 +50,7 @@ function complieAndRun(
   test,
   res
 ) {
-  const javaExecutablePath = `${__dirname}/../lib/Java/jdk-1.8/bin`;
+  const javaExecutablePath = `./../lib/Java/jdk-1.8/bin`;
   let responseSent = false;
 
   const javacProcess = spawn(`${javaExecutablePath}/javac`, [

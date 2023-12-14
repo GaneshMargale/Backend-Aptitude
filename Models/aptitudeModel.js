@@ -28,6 +28,11 @@ const aptitudeSchema = new mongoose.Schema({
       },
     },
   ],
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+  visibility: false,
 });
 
 const Aptitude = mongoose.model('Aptitude', aptitudeSchema);

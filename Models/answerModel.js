@@ -16,9 +16,9 @@ const answerSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Provide Question Number'],
       },
-      answerOption: {
+      answer: {
         type: String,
-        required: [true, 'Provide Answer Option'],
+        required: [true, 'Provide Answer'],
       },
     },
   ],

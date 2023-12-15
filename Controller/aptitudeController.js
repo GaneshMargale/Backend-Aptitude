@@ -112,25 +112,27 @@ exports.createAnswers = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.getContests = catchAsync(async (req, res, next) => {
-//   const contests = await Aptitude.find();
-//   let contest = [];
+exports.getAllAptitudeContests = catchAsync(async (req, res, next) => {
+  const contests = await Aptitude.find();
+  let contest = [];
 
-//   contests.forEach((document) =>
-//     contest.push({
-//       contestNumber: document.contestNumber,
-//       contestName: document.contestName,
-//     })
-//   );
+  contests.forEach((document) =>
+    contest.push({
+      contestNumber: document.contestNumber,
+      contestName: document.contestName,
+      time: document.time,
+      visibility: document.visibility,
+    })
+  );
 
-//   res.status(200).json({
-//     status: 'success',
-//     contests: contest.length,
-//     data: {
-//       Contest: contest,
-//     },
-//   });
-// });
+  res.status(200).json({
+    status: 'success',
+    contests: contest.length,
+    data: {
+      Contest: contest,
+    },
+  });
+});
 
 exports.getAptitudeContests = catchAsync(async (req, res, next) => {
   const profile = await Profile.findOne({ usn: req.params.usn });

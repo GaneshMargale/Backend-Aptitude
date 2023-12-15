@@ -116,20 +116,28 @@ exports.getAllAptitudeContests = catchAsync(async (req, res, next) => {
   const contests = await Aptitude.find();
   let contest = [];
 
-  contests.forEach((document) =>
+  const currentTime = Date.parse(new Date());
+
+  contests.forEach((document) => {
+    let questionTime = document.time;
+
+    let visible = currentTime >= questionTime;
+
     contest.push({
       contestNumber: document.contestNumber,
       contestName: document.contestName,
       time: document.time,
-      visibility: document.visibility,
-    })
-  );
+      visibility: visible,
+    });
+  });
+
+  contest.sort((a, b) => a.contestNumber - b.contestNumber);
 
   res.status(200).json({
     status: 'success',
     contests: contest.length,
     data: {
-      Contest: contest,
+      Contests: contest,
     },
   });
 });
@@ -186,10 +194,8 @@ exports.updateQuestionVisibility = catchAsync(async (req, res, next) => {
     return next(new AppError('Question not found', 404));
   }
 
-  const currentTime = new Date();
-
-  const questionTime = new Date(question.time);
-  questionTime.setSeconds(0, 0);
+  const currentTime = Date.parse(new Date());
+  const questionTime = question.time;
 
   if (currentTime >= questionTime) {
     await Aptitude.findOneAndUpdate(

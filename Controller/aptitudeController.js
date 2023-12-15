@@ -131,7 +131,7 @@ exports.getAllAptitudeContests = catchAsync(async (req, res, next) => {
     });
   });
 
-  contest.sort((a, b) => a.contestNumber - b.contestNumber);
+  contest.sort((a, b) => b.contestNumber - a.contestNumber);
 
   res.status(200).json({
     status: 'success',

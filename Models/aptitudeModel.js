@@ -29,7 +29,7 @@ const aptitudeSchema = new mongoose.Schema({
     },
   ],
   time: {
-    type: Date,
+    type: Number,
     default: Date.now,
   },
   visibility: false,

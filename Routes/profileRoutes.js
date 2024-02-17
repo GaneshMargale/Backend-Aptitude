@@ -4,32 +4,16 @@ const resultController = require('../Controller/resultController');
 const authController = require('../Controller/authController');
 const router = express.Router();
 
-// router.route('/').post(profileController.createProfile);
-const delayMiddleware = (req, res, next) => {
-  if (res.headersSent) {
-    return next();
-  }
-
-  setTimeout(() => {
-    console.log('Delaying middleware execution...');
-    next();
-  }, 3000);
-};
 router
   .route('/aptitude/:contestNumber/:usn')
   .patch(
-    profileController.updateAptitudeProfile,
-    delayMiddleware,
-    resultController.updateAptitudeResult
+    resultController.updateAptitudeResult,
+    profileController.updateAptitudeProfile
   );
 
 router
   .route('/dsa/:contestNumber/:usn')
-  .patch(
-    profileController.updateDSAProfile,
-    delayMiddleware,
-    resultController.updateDSAResult
-  );
+  .patch(resultController.updateDSAResult, profileController.updateDSAProfile);
 
 router.route('/:usn').get(profileController.getUserProfileDetails);
 

@@ -85,7 +85,7 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
       (document) => Number(req.params.contestNumber) === document.contestNumber
     )
   ) {
-    return next();
+    return next(new AppError('Result already submitted', 200));
   }
 
   const profile = await Profile.findOneAndUpdate(
@@ -117,8 +117,6 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
     status: 'success',
     profile: profile,
   });
-
-  next();
 });
 
 exports.updateDSAProfile = catchAsync(async (req, res, next) => {
@@ -135,7 +133,7 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
       (document) => Number(req.params.contestNumber) === document.contestNumber
     )
   ) {
-    return next();
+    return next(new AppError('Result already submitted', 200));
   }
 
   const profile = await Profile.findOneAndUpdate(
@@ -168,6 +166,4 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
     status: 'success',
     profile: profile,
   });
-
-  next();
 });

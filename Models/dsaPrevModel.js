@@ -20,30 +20,22 @@ const DSAPrevSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Provide the question description'],
       },
-      Input1: {
-        type: String,
-        required: [true, 'Provide the test case 1'],
-      },
-      Output1: {
-        type: String,
-        required: [true, 'Provide the test case 1'],
-      },
-      Input2: {
-        type: String,
-        required: [true, 'Provide the test case 2'],
-      },
-      Output2: {
-        type: String,
-        required: [true, 'Provide the test case 2'],
-      },
-      Input3: {
-        type: String,
-        required: [true, 'Provide the test case 3'],
-      },
-      Output3: {
-        type: String,
-        required: [true, 'Provide the test case 3'],
-      },
+      testCases: [
+        {
+          testCase: {
+            type: Number,
+            required: [true, 'Provide a test case'],
+          },
+          input: {
+            type: String,
+            required: [true, 'Provide a test input'],
+          },
+          output: {
+            type: String,
+            required: [true, 'Provide a test output'],
+          },
+        },
+      ],
     },
   ],
 });

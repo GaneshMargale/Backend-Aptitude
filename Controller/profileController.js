@@ -85,7 +85,7 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
       (document) => Number(req.params.contestNumber) === document.contestNumber
     )
   ) {
-    return next(new AppError('Result already submitted', 200));
+    return next();
   }
 
   const profile = await Profile.findOneAndUpdate(
@@ -117,6 +117,8 @@ exports.updateAptitudeProfile = catchAsync(async (req, res, next) => {
     status: 'success',
     profile: profile,
   });
+
+  next();
 });
 
 exports.updateDSAProfile = catchAsync(async (req, res, next) => {
@@ -133,7 +135,7 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
       (document) => Number(req.params.contestNumber) === document.contestNumber
     )
   ) {
-    return next(new AppError('Result already submitted', 200));
+    return next();
   }
 
   const profile = await Profile.findOneAndUpdate(
@@ -165,5 +167,37 @@ exports.updateDSAProfile = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     profile: profile,
+  });
+
+  next();
+});
+
+exports.getContestStats = catchAsync(async (req, res, next) => {
+  const stats = await Profile.aggregate([
+    {
+      $unwind: '$AptitudeEachPoints',
+    },
+    {
+      $match: {
+        'AptitudeEachPoints.contestNumber': 2,
+      },
+    },
+    {
+      $group: {
+        _id: '$branch',
+        totalPoints: { $sum: '$AptitudeEachPoints.points' },
+        averagePoints: { $avg: '$AptitudeEachPoints.points' },
+        maxPoints: { $max: '$AptitudeEachPoints.points' },
+        minPoints: { $min: '$AptitudeEachPoints.points' },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats: stats,
+    },
   });
 });
